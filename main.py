@@ -42,8 +42,8 @@ async def ping(ctx, ip):
     if net_connect == None:
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
-        output = net_connect.send_command(f'ping {ip}', read_timeout=20)
-        time.sleep(10)
+        output = net_connect.send_command_timing(f'ping {ip}', last_read=10.0)
+        await ctx.send(f'Pinging to {ip}...')
         count = 0
         for line in output.split('\n'):
             if '!' in line:
@@ -83,7 +83,7 @@ async def show_run_int(ctx, interface):
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show run int ' + interface)
-        await ctx.send('Configuration has been saved!')
+        await ctx.send(output)
 
 @bot.command()
 async def save_config(ctx):
@@ -91,7 +91,7 @@ async def save_config(ctx):
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('wr')
-        await ctx.send(output)
+        await ctx.send('Configuration has been saved!')
 
 @bot.command()
 async def hostname(ctx, hostname):
@@ -177,24 +177,23 @@ async def int_ip_gateway_add(ctx, ip_gateway):
     if net_connect == None:
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
-        configs = ['ip-default gateway ' + ip_gateway]
+        configs = ['ip default-gateway ' + ip_gateway]
         net_connect.send_config_set(configs)
-        await ctx.send('IP-default gateway ' + ip_gateway + ' has been added to switch')
+        await ctx.send('IP Default Gateway ' + ip_gateway + ' has been set on the device.')
 
 @bot.command()
-async def int_switch_mode(ctx, mode):
+async def int_switch_mode(ctx, interface, mode):
     if net_connect == None:
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         mode = mode.lower()
+        configs = ['int ' + interface,
+                       'switchport mode ' + mode]
+        net_connect.send_config_set(configs)
         if mode == 'access':
-            configs = ['switchport mode ' + mode]
-            net_connect.send_config_set(configs)
-            await ctx.send('Change to switchport mode access successfully!')
+            await ctx.send('Changed ' + interface + ' to switchport mode access successfully!')
         elif mode == 'trunk':
-            configs = ['switchport mode ' + mode]
-            net_connect.send_config_set(configs)
-            await ctx.send('Change to switchport mode trunk successfully!')
+            await ctx.send('Changed ' + interface + ' to switchport mode trunk successfully!')
 
 @bot.command()
 async def int_no_shut(ctx, interface):
@@ -204,8 +203,17 @@ async def int_no_shut(ctx, interface):
         configs = ['int ' + interface,
                    'no shut']
         net_connect.send_config_set(configs)
-        await ctx.send('Interface ' + interface + ' is no shutdown')
+        await ctx.send('Interface ' + interface + ' is now no shutdown.')
 
+@bot.command()
+async def int_shut(ctx, interface):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        configs = ['int ' + interface,
+                   'shut']
+        net_connect.send_config_set(configs)
+        await ctx.send('Interface ' + interface + ' is now shuted down.')
 
 bot.run(TOKEN)
 
