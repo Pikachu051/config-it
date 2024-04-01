@@ -56,5 +56,33 @@ async def show_vlan_br(ctx):
         output = net_connect.send_command('show vlan brief')
         await ctx.send(output)
 
+async def show_run(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show run')
+        await ctx.send(output)
+    
+async def show_run_int(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show run int')
+        await ctx.send(output)
+
+async def coopy_run_conf(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('coppy run conf')
+        await ctx.send(output)
+
+async def coopy_run_conf(ctx, hostname):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'hostname {hostname}')
+        await ctx.send(output)
+
 bot.run(TOKEN)
 
