@@ -83,6 +83,27 @@ async def hostname(ctx, hostname):
     else:
         output = net_connect.send_command(f'hostname {hostname}')
         await ctx.send(output)
+        
+async def show_route(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show ip route')
+        await ctx.send(output)
+        
+async def ip_route(ctx , dest_ip, dest_mark, next_hop):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
+        await ctx.send(output)
+        
+async def show_spanning_tree(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show spanning-tree')
+        await ctx.send(output)
 
 bot.run(TOKEN)
 
