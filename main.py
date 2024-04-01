@@ -37,9 +37,23 @@ async def connect(ctx, ip, username, password):
 
 async def ping(ctx, ip):
     if net_connect == None:
-        await ctx.send('You need to connect to a device first!')
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command(f'ping {ip}')
+        await ctx.send(output)
+
+async def show_int(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show intterface')
+        await ctx.send(output)
+
+async def show_vlan_br(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show vlan brief')
         await ctx.send(output)
 
 bot.run(TOKEN)
