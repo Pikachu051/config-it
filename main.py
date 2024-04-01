@@ -10,6 +10,7 @@ TOKEN: Final[str] = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID: Final[int] = int(os.getenv("CHANNEL_ID"))
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+net_connect = None
 
 @bot.event
 async def on_ready():
@@ -34,6 +35,12 @@ async def connect(ctx, ip, username, password):
     else:
         await ctx.send(f'Connected to {ip} successfully!')
 
+async def ping(ctx, ip):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!')
+    else:
+        output = net_connect.send_command(f'ping {ip}')
+        await ctx.send(output)
 
 bot.run(TOKEN)
 
