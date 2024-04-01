@@ -27,6 +27,13 @@ async def connect(ctx, ip, username, password):
         'port': 22,
     }
     await ctx.send(f'Connecting to {ip}...')
+    net_connect = ConnectHandler(**device)
+    output = net_connect.send_command('show ip int brief')
+    if output == '':
+        await ctx.send('Failed to connect to device')
+    else:
+        await ctx.send(f'Connected to {ip} successfully!')
+
 
 bot.run(TOKEN)
 
