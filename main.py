@@ -40,7 +40,11 @@ async def ping(ctx, ip):
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command(f'ping {ip}')
-        await ctx.send(output)
+        count = 0
+        for line in output.split('\n'):
+            if '!' in line:
+                count += 1
+        await ctx.send('Packets sent: 5, Packets received: ' + str(count) + ', Packet loss: ' + str(5 - count) + ' (' + str((5 - count) * 20) + '%% loss)')
 
 async def show_int(ctx):
     if net_connect == None:
@@ -49,12 +53,68 @@ async def show_int(ctx):
         output = net_connect.send_command('show intterface')
         await ctx.send(output)
 
-async def show_vlan_br(ctx):
+async def show_vlan(ctx):
     if net_connect == None:
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show vlan brief')
         await ctx.send(output)
+
+async def show_run(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show run')
+        await ctx.send(output)
+    
+async def show_run_int(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show run int')
+        await ctx.send(output)
+
+async def save_config(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('copy running-config startup-config')
+        await ctx.send(output)
+
+async def hostname(ctx, hostname):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'hostname {hostname}')
+        await ctx.send(output)
+        
+async def show_route(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show ip route')
+        await ctx.send(output)
+        
+async def ip_route(ctx , dest_ip, dest_mark, next_hop):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
+        await ctx.send('Route has been added!')
+        
+async def show_spanning_tree(ctx):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command('show spanning-tree')
+        await ctx.send(output)
+
+async def banner(ctx, str):
+    if net_connect == None:
+        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'banner motd # {str} #')
+        await ctx.send('Banner has been set!')
 
 bot.run(TOKEN)
 
