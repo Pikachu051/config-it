@@ -45,7 +45,7 @@ async def connect(ctx, ip, username, password):
         await ctx.send(f'Connected to {ip} successfully!')
 
 @bot.command()
-async def help(ctx):
+async def command_list(ctx):
     embed = discord.Embed(title="Help", description="List of available commands", color=0x00ff00)
     embed.add_field(name="!connect <ip> <username> <password>", value="Connect to a network device", inline=False)
     embed.add_field(name="!ping <ip>", value="Ping an IP address", inline=False)
@@ -70,7 +70,7 @@ async def help(ctx):
     
     mention = ctx.author.mention
     await ctx.author.send(embed=embed)
-    await ctx.send(f'{mention}, Help command sent to your DM!')
+    await ctx.send(f'{mention}, Command lists sent to your DM!')
 
 @bot.command()
 async def ping(ctx, ip):
