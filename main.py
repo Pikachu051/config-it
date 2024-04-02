@@ -19,6 +19,13 @@ async def on_ready():
     channel = bot.get_channel(CHANNEL_ID)
     await channel.send('Bot is ready!')
 
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send('Invalid command. Type !help to see the list of available commands.')
+    else:
+        raise error
+
 @bot.command()
 async def connect(ctx, ip, username, password):
     global net_connect
