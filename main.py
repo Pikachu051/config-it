@@ -67,9 +67,10 @@ async def help(ctx):
     embed.add_field(name="!int_switch_mode <interface> <mode>", value="Set interface switchport mode", inline=False)
     embed.add_field(name="!int_no_shut <interface>", value="No shutdown interface", inline=False)
     embed.add_field(name="!int_shut <interface>", value="Shutdown interface", inline=False)
-
+    
+    mention = ctx.author.mention
     await ctx.author.send(embed=embed)
-    await ctx.send("Help command sent to your DM!")
+    await ctx.send(f'{mention}, Help command sent to your DM!')
 
 @bot.command()
 async def ping(ctx, ip):
