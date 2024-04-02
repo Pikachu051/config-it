@@ -19,47 +19,53 @@ net_connect = None
 async def on_ready():
     print('Bot is ready!')
     channel = bot.get_channel(CHANNEL_ID)
-    await channel.send('Bot is ready!')
+    embed = discord.Embed(title="Bot is ready!", color=0x00ff00)
+    await channel.send(embed=embed)
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send('Invalid command. Type !help to see the list of available commands.')
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Invalid command. Type **!help** to see the list of available commands.", inline=False)
+        await ctx.send(embed=embed)
     else:
         raise error
 
 connections = {}
 
+@bot.command()
 async def create_connection(ctx, ip, username, password):
     discord_username = str(ctx.author)
-    tagline = ctx.author.discriminator
 
-    user_connections = [key for key in connections if key.startswith(f"{discord_username}#{tagline}:")]
+    user_connections = [key for key in connections if key.startswith(f"{discord_username}:")]
     device_index = len(user_connections) + 1
 
-    key = f"{discord_username}#{tagline}:{device_index}"
+    key = f"{discord_username}:{device_index}"
     if key in connections:
-        await ctx.send(f"```Device {device_index} is already connected for {discord_username}#{tagline}.```")
+        await ctx.send(f"```Device {device_index} is already connected for {discord_username}.```")
         return
 
     connections[key] = [ip, username, password]
-    await ctx.send(f"```Connection created for {discord_username}#{tagline} with device {device_index}.```")
+    await ctx.send(f"```Connection created for {discord_username} with device #{device_index}.```")
 
 @bot.command()
 async def connect(ctx, device_index: int = None):
     discord_username = str(ctx.author)
-    tagline = ctx.author.discriminator
 
     if device_index is None:
-        user_connections = [key for key in connections if key.startswith(f"{discord_username}#{tagline}:")]
+        user_connections = [key for key in connections if key.startswith(f"{discord_username}:")]
         if not user_connections:
             await ctx.send("```You don't have any devices connected.\n\nUse !create_connection first.```")
             return
         device_index = 1
 
-    key = f"{discord_username}#{tagline}:{device_index}"
+    key = f"{discord_username}:{device_index}"
     if key not in connections:
-        await ctx.send(f"```No device information found for the device at index {device_index}.\n\nUse !create_connection first.```")
+        embed = discord.Embed(title="Error", description="Device not found", color=0xff0000)
+        embed.add_field(name="", value=f"No device information found for the device at index {device_index}.", inline=False)
+        embed.add_field(name="", value="Use !create_connection first.", inline=False)
+        await ctx.send(embed=embed)
+        #await ctx.send(f"```No device information found for the device at index {device_index}.\n\nUse !create_connection first.```")
         return
 
     ip, username, password = connections[key]
@@ -80,23 +86,6 @@ async def connect(ctx, device_index: int = None):
     else:
         await ctx.send(f'```Connected to {ip} successfully!```')
         connections[key].append(net_connect)
-
-@bot.command()
-async def connect(ctx, ip, username, password):
-    global net_connect
-    device = {
-        'device_type': 'cisco_ios',
-        'host': ip,
-        'username': username,
-        'password': password,
-        'port': 22,
-    }
-    await ctx.send(f'```Connecting to {ip}...```')
-    try:
-        net_connect = ConnectHandler(**device)
-        await ctx.send(f'```Connected to {ip} successfully!```')
-    except Exception as e:
-        print('```Failed to connect to the device.```')
 
 @bot.command()
 async def command_list(ctx):
