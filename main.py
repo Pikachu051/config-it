@@ -13,6 +13,8 @@ CHANNEL_ID: Final[int] = int(os.getenv("CHANNEL_ID"))
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 net_connect = None
 
+
+
 @bot.event
 async def on_ready():
     print('Bot is ready!')
@@ -26,6 +28,59 @@ async def on_command_error(ctx, error):
     else:
         raise error
 
+connections = {}
+
+async def create_connection(ctx, ip, username, password):
+    discord_username = str(ctx.author)
+    tagline = ctx.author.discriminator
+
+    user_connections = [key for key in connections if key.startswith(f"{discord_username}#{tagline}:")]
+    device_index = len(user_connections) + 1
+
+    key = f"{discord_username}#{tagline}:{device_index}"
+    if key in connections:
+        await ctx.send(f"```Device {device_index} is already connected for {discord_username}#{tagline}.```")
+        return
+
+    connections[key] = [ip, username, password]
+    await ctx.send(f"```Connection created for {discord_username}#{tagline} with device {device_index}.```")
+
+@bot.command()
+async def connect(ctx, device_index: int = None):
+    discord_username = str(ctx.author)
+    tagline = ctx.author.discriminator
+
+    if device_index is None:
+        user_connections = [key for key in connections if key.startswith(f"{discord_username}#{tagline}:")]
+        if not user_connections:
+            await ctx.send("```You don't have any devices connected.\n\nUse !create_connection first.```")
+            return
+        device_index = 1
+
+    key = f"{discord_username}#{tagline}:{device_index}"
+    if key not in connections:
+        await ctx.send(f"```No device information found for the device at index {device_index}.\n\nUse !create_connection first.```")
+        return
+
+    ip, username, password = connections[key]
+
+    device = {
+        'device_type': 'cisco_ios',
+        'host': ip,
+        'username': username,
+        'password': password,
+        'port': 22,
+    }
+
+    await ctx.send(f'```Connecting to {ip}...```')
+    net_connect = ConnectHandler(**device)
+    output = net_connect.send_command('show ip int brief')
+    if output == '':
+        await ctx.send('```Failed to connect to device```')
+    else:
+        await ctx.send(f'```Connected to {ip} successfully!```')
+        connections[key].append(net_connect)
+
 @bot.command()
 async def connect(ctx, ip, username, password):
     global net_connect
@@ -36,13 +91,12 @@ async def connect(ctx, ip, username, password):
         'password': password,
         'port': 22,
     }
-    await ctx.send(f'Connecting to {ip}...')
-    net_connect = ConnectHandler(**device)
-    output = net_connect.send_command('show ip int brief')
-    if output == '':
-        await ctx.send('Failed to connect to device')
-    else:
-        await ctx.send(f'Connected to {ip} successfully!')
+    await ctx.send(f'```Connecting to {ip}...```')
+    try:
+        net_connect = ConnectHandler(**device)
+        await ctx.send(f'```Connected to {ip} successfully!```')
+    except Exception as e:
+        print('```Failed to connect to the device.```')
 
 @bot.command()
 async def command_list(ctx):
@@ -70,25 +124,25 @@ async def command_list(ctx):
     
     mention = ctx.author.mention
     await ctx.author.send(embed=embed)
-    await ctx.send(f'{mention}, Command lists sent to your DM!')
+    await ctx.send(f'```{mention}, Command lists sent to your DM!```')
 
 @bot.command()
 async def ping(ctx, ip):
     if net_connect == None:
-        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+        await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
         output = net_connect.send_command_timing(f'ping {ip}', last_read=10.0)
-        await ctx.send(f'Pinging to {ip}...')
+        await ctx.send(f'```Pinging to {ip}...```')
         count = 0
         for line in output.split('\n'):
             if '!' in line:
                 count += 1
-        await ctx.send('Packets sent: 5, Packets received: ' + str(count) + ', Packet loss: ' + str(5 - count) + ' (' + str((5 - count) * 20) + '% loss)')
+        await ctx.send('```Packets sent: 5, Packets received: ' + str(count) + ', Packet loss: ' + str(5 - count) + ' (' + str((5 - count) * 20) + '% loss)```')
 
 @bot.command()
 async def show_int(ctx):
     if net_connect == None:
-        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+        await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
         output = net_connect.send_command('show ip int brief')
         await ctx.send(output)
@@ -96,11 +150,11 @@ async def show_int(ctx):
 @bot.command()
 async def show_vlan(ctx):
     if net_connect == None:
-        await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+        await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
         output = net_connect.send_command('show vlan brief')
         if 'Invalid' in output:
-            await ctx.send('This command is not supported on router.')
+            await ctx.send('```This command is not supported on router.```')
         else:
             await ctx.send(output)
 
