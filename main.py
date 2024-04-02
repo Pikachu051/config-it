@@ -45,6 +45,33 @@ async def connect(ctx, ip, username, password):
         await ctx.send(f'Connected to {ip} successfully!')
 
 @bot.command()
+async def help(ctx):
+    embed = discord.Embed(title="Help", description="List of available commands", color=0x00ff00)
+    embed.add_field(name="!connect <ip> <username> <password>", value="Connect to a network device", inline=False)
+    embed.add_field(name="!ping <ip>", value="Ping an IP address", inline=False)
+    embed.add_field(name="!show_int", value="Show interface status", inline=False)
+    embed.add_field(name="!show_vlan", value="Show VLAN information", inline=False)
+    embed.add_field(name="!show_run", value="Show running configuration", inline=False)
+    embed.add_field(name="!show_run_int <interface>", value="Show interface configuration", inline=False)
+    embed.add_field(name="!save_config", value="Save running configuration", inline=False)
+    embed.add_field(name="!hostname <hostname>", value="Set device hostname", inline=False)
+    embed.add_field(name="!show_route", value="Show IP routing table", inline=False)
+    embed.add_field(name="!ip_route <dest_ip> <dest_mark> <next_hop>", value="Add IP route", inline=False)
+    embed.add_field(name="!show_spanning_tree", value="Show spanning tree information", inline=False)
+    embed.add_field(name="!banner <str>", value="Set banner message", inline=False)
+    embed.add_field(name="!create_vlan <id>", value="Create a new VLAN", inline=False)
+    embed.add_field(name="!vlan_ip_add <vlan> <ip_addr> <netmask>", value="Add IP address to VLAN", inline=False)
+    embed.add_field(name="!vlan_no_shut <id>", value="No shutdown VLAN", inline=False)
+    embed.add_field(name="!int_ip_add <interface> <ip> <mask>", value="Add IP address to interface", inline=False)
+    embed.add_field(name="!int_ip_gateway_add <ip_gateway>", value="Set default gateway", inline=False)
+    embed.add_field(name="!int_switch_mode <interface> <mode>", value="Set interface switchport mode", inline=False)
+    embed.add_field(name="!int_no_shut <interface>", value="No shutdown interface", inline=False)
+    embed.add_field(name="!int_shut <interface>", value="Shutdown interface", inline=False)
+
+    await ctx.author.send(embed=embed)
+    await ctx.send("Help command sent to your DM!")
+
+@bot.command()
 async def ping(ctx, ip):
     if net_connect == None:
         await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
