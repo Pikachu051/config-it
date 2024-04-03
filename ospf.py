@@ -3,7 +3,7 @@ import discord
 from netmiko import ConnectHandler
 from net_cal import wildcard_mask
 
-def router_ospf(networks):
+def ospf(networks):
         networks = networks.split(',')
         networks = [network.split('/') for network in networks]
         commands = []
