@@ -139,7 +139,7 @@ async def show_connection(ctx):
     if not user_connections:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You don't have any devices connected.", inline=False)
-        embed.add_field(name="", value="Use !create_connection first.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection** first.", inline=False)
         await ctx.send(embed=embed)
         return
 
@@ -148,6 +148,8 @@ async def show_connection(ctx):
         device_index = key.split(":")[1]
         ip, _, _ = connections[key]
         embed.add_field(name=f"Device #{device_index}", value=f"IP: {ip}", inline=False)
+    mention = ctx.author.mention
+    await ctx.send(mention + '```List of connected devices has been sent to your DM!```')
     await ctx.author.send(embed=embed)
 
 @bot.command()
