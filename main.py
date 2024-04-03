@@ -301,15 +301,36 @@ async def hostname(ctx, index, hostname):
         embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
-        output = net_connect.send_command(f'hostname {hostname}')
+        command_list = ['hostname ' + hostname]
+        output = net_connect.send_config_set(command_list)
         await ctx.send('```Hostname has been set to ' + hostname+'```')
         net_connect.disconnect()
         
 @bot.command()
-async def show_route(ctx, index):
+async def show_hostname(ctx, index):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show run | include hostname')
+        output = output.split(' ')[1]
+        await ctx.send('```Hostname: '+output+'```')
+        net_connect.disconnect()
+
+@bot.command()
+async def show_route(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f'{discord_username}:{index}'
     if key not in connections:
         no_index_exists()
         return
@@ -362,6 +383,10 @@ async def show_spanning_tree(ctx, index):
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show spanning-tree')
+        if 'No spanning tree' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value=output, inline=False)
+            await ctx.send(embed=embed)
         await ctx.send('```'+output+'```')
         net_connect.disconnect()
 
