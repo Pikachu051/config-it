@@ -204,7 +204,15 @@ async def show_int(ctx, index):
         net_connect.disconnect()
 
 @bot.command()
-async def show_vlan(ctx):
+async def show_vlan(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -216,9 +224,18 @@ async def show_vlan(ctx):
             await ctx.send('```This command is not supported on router.```')
         else:
             await ctx.send('```'+output+'```')
+            net_connect.disconnect()
 
 @bot.command()
-async def show_run(ctx):
+async def show_run(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -226,10 +243,19 @@ async def show_run(ctx):
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show run')
-        await ctx.send('```'+output+'```')   
+        await ctx.send('```'+output+'```')
+        net_connect.disconnect() 
 
 @bot.command()
-async def show_run_int(ctx, interface):
+async def show_run_int(ctx, index, interface):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -238,9 +264,18 @@ async def show_run_int(ctx, interface):
     else:
         output = net_connect.send_command('show run int ' + interface)
         await ctx.send('```'+output+'```')
+        net_connect.disconnect()
 
 @bot.command()
-async def save_config(ctx):
+async def save_config(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -249,9 +284,18 @@ async def save_config(ctx):
     else:
         output = net_connect.send_command('wr')
         await ctx.send('```Configuration has been saved!```')
+        net_connect.disconnect()
 
 @bot.command()
-async def hostname(ctx, hostname):
+async def hostname(ctx, index, hostname):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -260,9 +304,18 @@ async def hostname(ctx, hostname):
     else:
         output = net_connect.send_command(f'hostname {hostname}')
         await ctx.send('```Hostname has been set to ' + hostname+'```')
+        net_connect.disconnect()
         
 @bot.command()
-async def show_route(ctx):
+async def show_route(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -271,9 +324,18 @@ async def show_route(ctx):
     else:
         output = net_connect.send_command('show ip route')
         await ctx.send('```'+output+'```')
+        net_connect.disconnect()
         
 @bot.command()
-async def ip_route(ctx , dest_ip, dest_mark, next_hop):
+async def ip_route(ctx , index, dest_ip, dest_mark, next_hop):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -282,9 +344,18 @@ async def ip_route(ctx , dest_ip, dest_mark, next_hop):
     else:
         output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
         await ctx.send('```Route has been added!```')
+        net_connect.disconnect()
         
 @bot.command()
-async def show_spanning_tree(ctx):
+async def show_spanning_tree(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -293,9 +364,18 @@ async def show_spanning_tree(ctx):
     else:
         output = net_connect.send_command('show spanning-tree')
         await ctx.send('```'+output+'```')
+        net_connect.disconnect()
 
 @bot.command()
-async def banner(ctx, str):
+async def banner(ctx, index, str):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -304,9 +384,18 @@ async def banner(ctx, str):
     else:
         output = net_connect.send_command(f'banner motd # {str} #')
         await ctx.send('```Banner has been set!```')
+        net_connect.disconnect()
 
 @bot.command()
-async def create_vlan(ctx, id):
+async def create_vlan(ctx, index, id):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -316,9 +405,18 @@ async def create_vlan(ctx, id):
         configs = ['vlan ' + id]
         net_connect.send_config_set(configs)
         await ctx.send(f'```VLAN {id} created.```')
+        net_connect.disconnect()
 
 @bot.command()
-async def vlan_ip_add(ctx, vlan, ip_addr, netmask):
+async def vlan_ip_add(ctx, index, vlan, ip_addr, netmask):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -329,9 +427,18 @@ async def vlan_ip_add(ctx, vlan, ip_addr, netmask):
                    'ip add ' + ip_addr + ' ' + netmask]
         net_connect.send_config_set(configs)
         await ctx.send(f'```IP Address {ip_addr} and Subnet Mask {netmask} has been added to VLAN {vlan}.```')
+        net_connect.disconnect()
 
 @bot.command()
-async def vlan_no_shut(ctx, id):
+async def vlan_no_shut(ctx, index, id):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -342,9 +449,18 @@ async def vlan_no_shut(ctx, id):
                    'no sh']
         net_connect.send_config_set(configs)
         await ctx.send(f'```No shutdown VLAN {id} succeed.```')
+        net_connect.disconnect()
 
 @bot.command()
-async def int_ip_add(ctx, interface, ip, mask):
+async def int_ip_add(ctx, index, interface, ip, mask):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -355,9 +471,18 @@ async def int_ip_add(ctx, interface, ip, mask):
                    'ip add ' + ip + ' ' + mask]
         net_connect.send_config_set(configs)
         await ctx.send(f'```IP Address {ip} and Subnet Mask {mask} has been added to Interface {interface}```')
+        net_connect.disconnect()
 
 @bot.command()
-async def int_ip_gateway_add(ctx, ip_gateway):
+async def int_ip_gateway_add(ctx, index, ip_gateway):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -367,9 +492,18 @@ async def int_ip_gateway_add(ctx, ip_gateway):
         configs = ['ip default-gateway ' + ip_gateway]
         net_connect.send_config_set(configs)
         await ctx.send(f'```IP Default Gateway {ip_gateway} has been set on the device.```')
+        net_connect.disconnect()
 
 @bot.command()
-async def int_switch_mode(ctx, interface, mode):
+async def int_switch_mode(ctx,index, interface, mode):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -384,9 +518,18 @@ async def int_switch_mode(ctx, interface, mode):
             await ctx.send(f'```Changed {interface} to switchport mode access successfully!```')
         elif mode == 'trunk':
             await ctx.send(f'```Changed {interface} to switchport mode trunk successfully!```')
+        net_connect.disconnect()
 
 @bot.command()
-async def int_no_shut(ctx, interface):
+async def int_no_shut(ctx,index, interface):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -397,9 +540,18 @@ async def int_no_shut(ctx, interface):
                    'no shut']
         net_connect.send_config_set(configs)
         await ctx.send(f'```Interface {interface} is now no shutdown.```')
+        net_connect.disconnect()
 
 @bot.command()
-async def int_shut(ctx, interface):
+async def int_shut(ctx,index, interface):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -410,6 +562,7 @@ async def int_shut(ctx, interface):
                    'shut']
         net_connect.send_config_set(configs)
         await ctx.send(f'```Interface {interface} is now shuted down.```')
+        net_connect.disconnect()
 
 bot.run(TOKEN)
 
