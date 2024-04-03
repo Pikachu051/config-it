@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from discord.ext import commands
 import discord
 from netmiko import ConnectHandler
-from ospf import ospf
-from rip import rip
-from bgp import bgp
-from eigrp import eigrp
+from ospf import ospf, remove_ospf_nw, disable_ospf
+from rip import rip, remove_rip_nw, disable_rip
+from bgp import bgp, remove_bgp_nw, remove_bgp_neighbor, disable_bgp
+from eigrp import eigrp, remove_eigrp_nw, disable_eigrp
 
 
 load_dotenv()
@@ -671,6 +671,507 @@ async def int_shut(ctx,index, interface):
         net_connect.send_config_set(configs)
         await ctx.send(f'```Interface {interface} is now shuted down.```')
         net_connect.disconnect()
+
+@bot.command()
+async def ospf(ctx, index, networks):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = ospf(networks)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!ospf <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="OSPF has been configured with the following configuration", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                wildcard = command.split(' ')[2]
+                area = command.split(' ')[4]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="Wildcard", value=wildcard, inline=False)
+                embed.add_field(name="Area", value=area, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def remove_ospf_nw(ctx, index, networks):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = remove_ospf_nw(networks)
+        output = net_connect.send_config_set(commands)
+        if 'in' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_ospf_nw <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The following OSPF networks has been removed.", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                area = command.split(' ')[4]
+                embed.add_field(name="Network", value=ip + " Area: " + area, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def disable_ospf(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = disable_ospf()
+        output = net_connect.send_config_set(commands)
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="OSPF has been disabled.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def rip(ctx, index, networks):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = rip(networks)
+        print(commands)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!rip <network_ip,network_ip2>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="RIP has been configured with the following configuration", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def remove_rip_nw(ctx, index, networks):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = remove_rip_nw(networks)
+        output = net_connect.send_config_set(commands)
+        if 'in' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_rip_nw <network_ip,network_ip2>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The following RIP networks has been removed.", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def disable_rip(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = disable_rip()
+        output = net_connect.send_config_set(commands)
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="RIP has been disabled.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def eigrp(ctx, index, networks, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = eigrp(networks, asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!eigrp <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="EIGRP has been configured with the following configuration", inline=False)
+        embed.add_field(name="AS Number", value=asn, inline=False)
+        embed.add_field(name="", value="", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                mask = command.split(' ')[2]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="Subnet Mask", value=mask, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def remove_eigrp_nw(ctx, index, networks, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = remove_eigrp_nw(networks, asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_eigrp_nw <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The following EIGRP networks has been removed.", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                mask = command.split(' ')[2]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="Subnet Mask", value=mask, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def disable_eigrp(ctx, index, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = disable_eigrp(asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!disable_eigrp <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="EIGRP has been disabled.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def bgp(ctx, index, networks, neighbors, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = bgp(networks, neighbors, asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!bgp <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <neighbor_ip/neighbor_as> <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="BGP has been configured with the following configuration", inline=False)
+        embed.add_field(name="AS Number", value=asn, inline=False)
+        embed.add_field(name="", value="", inline=False)
+        embed.add_field(name="---Networks---", value="", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                mask = command.split(' ')[2]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="Subnet Mask", value=mask, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        embed.add_field(name="---Neighbors---", value="", inline=False)
+        for command in commands:
+            if "neighbor" in command:
+                neighbor = command.split(' ')[1]
+                neighbor_asn = command.split(' ')[3]
+                embed.add_field(name="Neighbor", value=neighbor, inline=False)
+                embed.add_field(name="Neighbor ASN", value=neighbor_asn, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def remove_bgp_nw(ctx, index, networks, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = remove_bgp_nw(networks, asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_bgp_nw <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The following BGP networks has been removed.", inline=False)
+        for command in commands:
+            if "network" in command:
+                ip = command.split(' ')[1]
+                mask = command.split(' ')[2]
+                embed.add_field(name="Network", value=ip, inline=False)
+                embed.add_field(name="Subnet Mask", value=mask, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def remove_bgp_neighbor(ctx, index, neighbors, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = remove_bgp_neighbor(neighbors, asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_bgp_neighbor <neighbor_ip/neighbor_as> <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The following BGP neighbors has been removed.", inline=False)
+        for command in commands:
+            if "neighbor" in command:
+                neighbor = command.split(' ')[1]
+                neighbor_asn = command.split(' ')[3]
+                embed.add_field(name="Neighbor", value=neighbor, inline=False)
+                embed.add_field(name="Neighbor ASN", value=neighbor_asn, inline=False)
+                embed.add_field(name="", value="----------------------", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def disable_bgp(ctx, index, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        commands = disable_bgp(asn)
+        output = net_connect.send_config_set(commands)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!disable_bgp <as>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="BGP has been disabled.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
 
 bot.run(TOKEN)
 
