@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from discord.ext import commands
 import discord
 from netmiko import ConnectHandler
-import time
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv("DISCORD_TOKEN")
