@@ -165,7 +165,7 @@ async def ping(ctx, index, ip):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use !connect <ip> <username> <password> to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
         await ctx.send(embed=embed)
     else:
         cmd_list = ['ping ' + ip,
