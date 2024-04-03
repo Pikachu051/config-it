@@ -253,7 +253,12 @@ async def show_run_int(ctx, index, interface):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -273,7 +278,12 @@ async def save_config(ctx, index):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -293,7 +303,12 @@ async def hostname(ctx, index, hostname):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -314,8 +329,12 @@ async def show_hostname(ctx, index):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
-
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -334,7 +353,12 @@ async def show_route(ctx, index):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -354,7 +378,12 @@ async def ip_route(ctx , index, dest_ip, dest_mark, next_hop):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -374,7 +403,12 @@ async def show_spanning_tree(ctx, index):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -398,7 +432,12 @@ async def banner(ctx, index, str):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -418,7 +457,12 @@ async def create_vlan(ctx, index, id):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -439,7 +483,12 @@ async def vlan_ip_add(ctx, index, vlan, ip_addr, netmask):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -461,7 +510,12 @@ async def vlan_no_shut(ctx, index, id):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -483,7 +537,12 @@ async def int_ip_add(ctx, index, interface, ip, mask):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -505,7 +564,12 @@ async def int_ip_gateway_add(ctx, index, ip_gateway):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -526,7 +590,12 @@ async def int_switch_mode(ctx,index, interface, mode):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -552,7 +621,12 @@ async def int_no_shut(ctx,index, interface):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
@@ -574,7 +648,12 @@ async def int_shut(ctx,index, interface):
     if key not in connections:
         no_index_exists()
         return
-    net_connect = await connect(ctx, index)
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
 
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
