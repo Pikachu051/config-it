@@ -519,7 +519,7 @@ async def int_ip_gateway_add(ctx, index, ip_gateway):
         net_connect.disconnect()
 
 @bot.command()
-async def int_switch_mode(ctx,index, interface, mode):
+async def int_switch_mode(ctx, index, interface, mode):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
