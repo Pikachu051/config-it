@@ -181,7 +181,15 @@ async def ping(ctx, index, ip):
         net_connect.disconnect()
         
 @bot.command()
-async def show_int(ctx):
+async def show_int(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
@@ -191,6 +199,7 @@ async def show_int(ctx):
     else:
         output = net_connect.send_command('show ip int brief')
         await ctx.send('```'+output+'```')
+        net_connect.disconnect()
 
 @bot.command()
 async def show_vlan(ctx):
