@@ -13,7 +13,14 @@ CHANNEL_ID: Final[int] = int(os.getenv("CHANNEL_ID"))
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 net_connect = None
 
+connections = {}
 
+def no_index_exists():
+    embed = discord.Embed(title="Error", color=0xff0000)
+    embed.add_field(name="", value="No device at the index provided.", inline=False)
+    embed.add_field(name="", value="Use !show_connection to show all connected device with index.", inline=False)
+    embed.add_field(name="", value="Use !create_connection <ip_addr> <username> <password> to connect to a device.", inline=False)
+    return embed
 
 @bot.event
 async def on_ready():
@@ -31,7 +38,6 @@ async def on_command_error(ctx, error):
     else:
         raise error
 
-connections = {}
 
 @bot.command()
 async def create_connection(ctx, ip, username, password):
@@ -47,9 +53,11 @@ async def create_connection(ctx, ip, username, password):
 
     connections[key] = [ip, username, password]
     await ctx.send(f"```Connection created for {discord_username} with device #{device_index}.```")
+    print(connections)
 
 @bot.command()
 async def connect(ctx, device_index: int = None):
+    global net_connect
     discord_username = str(ctx.author)
 
     if device_index is None:
@@ -59,7 +67,7 @@ async def connect(ctx, device_index: int = None):
             embed.add_field(name="", value="You don't have any devices connected.", inline=False)
             embed.add_field(name="", value="Use !create_connection first.", inline=False)
             await ctx.send(embed=embed)
-            return
+            return None
         device_index = 1
 
     key = f"{discord_username}:{device_index}"
@@ -69,7 +77,7 @@ async def connect(ctx, device_index: int = None):
         embed.add_field(name="", value="Use !create_connection first.", inline=False)
         await ctx.send(embed=embed)
         #await ctx.send(f"```No device information found for the device at index {device_index}.\n\nUse !create_connection first.```")
-        return
+        return None
 
     ip, username, password = connections[key]
 
@@ -88,18 +96,18 @@ async def connect(ctx, device_index: int = None):
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="Failed to connect to device.", inline=False)
         await ctx.send(embed=embed)
-        # await ctx.send('```Failed to connect to device```')
+        return None
     else:
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value=f"Connected to {ip} successfully!", inline=False)
         await ctx.send(embed=embed)
-        # await ctx.send(f'```Connected to {ip} successfully!```')
-        connections[key].append(net_connect)
+        return net_connect
 
 @bot.command()
 async def command_list(ctx):
     embed = discord.Embed(title="Help", description="List of available commands", color=0x00ff00)
-    embed.add_field(name="!connect <ip> <username> <password>", value="Connect to a network device", inline=False)
+    embed.add_field(name="!create_connection <ip> <username> <password>", value="Add a device to connection list", inline=False)
+    embed.add_field(name="!show_connection", value="Show all connected devices", inline=False)
     embed.add_field(name="!ping <ip>", value="Ping an IP address", inline=False)
     embed.add_field(name="!show_int", value="Show interface status", inline=False)
     embed.add_field(name="!show_vlan", value="Show VLAN information", inline=False)
@@ -124,29 +132,54 @@ async def command_list(ctx):
     await ctx.author.send(embed=embed)
     await ctx.send(f'{mention}'+'``` Command lists sent to your DM!```')
     
+@bot.command()
+async def show_connection(ctx):
+    discord_username = str(ctx.author)
+    user_connections = [key for key in connections if key.startswith(f"{discord_username}:")]
+    if not user_connections:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You don't have any devices connected.", inline=False)
+        embed.add_field(name="", value="Use !create_connection first.", inline=False)
+        await ctx.send(embed=embed)
+        return
+
+    embed = discord.Embed(title="Connected Devices", color=0x00ff00)
+    for key in user_connections:
+        device_index = key.split(":")[1]
+        ip, _, _ = connections[key]
+        embed.add_field(name=f"Device #{device_index}", value=f"IP: {ip}", inline=False)
+    await ctx.author.send(embed=embed)
 
 @bot.command()
-async def ping(ctx, ip):
+async def ping(ctx, index, ip):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    net_connect = await connect(ctx, index)
+
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use !connect <ip> <username> <password> to connect to a device.", inline=False)
         await ctx.send(embed=embed)
-        # await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
-        output = net_connect.send_command_timing(f'ping {ip}', last_read=10.0)
+        cmd_list = ['ping ' + ip,
+                     '\n']
         await ctx.send(f'```Pinging to {ip}...```')
-        count = 0
-        for line in output.split('\n'):
-            if '!' in line:
-                count += 1
+        output = net_connect.send_multiline_timing(cmd_list)
+        count = output.count('!')
         embed = discord.Embed(title="Ping Result", color=0x00ff00)
         embed.add_field(name="Packets sent", value="5", inline=False)
         embed.add_field(name="Packets received", value=str(count), inline=False)
+        embed.add_field(name="", value="----------------------", inline=False)
+        embed.add_field(name="Packet received", value=f"{count} ({count * 20}% received)", inline=False)
         embed.add_field(name="Packet loss", value=f"{5 - count} ({(5 - count) * 20}% loss)", inline=False)
         await ctx.send(embed=embed)
-        # await ctx.send('```Packets sent: 5, Packets received: ' + str(count) + ', Packet loss: ' + str(5 - count) + ' (' + str((5 - count) * 20) + '% loss)```')
-
+        net_connect.disconnect()
+        
 @bot.command()
 async def show_int(ctx):
     if net_connect == None:
