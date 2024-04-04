@@ -421,6 +421,31 @@ async def create_route(ctx , index, dest_ip, dest_mark, next_hop):
         output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
         await ctx.send('```Route has been added!```')
         net_connect.disconnect()
+
+@bot.command()
+async def delete_route(ctx, index, dest_ip, dest_mark, next_hop):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        output = net_connect.send_command(f'no ip route {dest_ip} {dest_mark} {next_hop}')
+        await ctx.send('```Route has been deleted!```')
+        net_connect.disconnect()
         
 @bot.command()
 async def show_spanning_tree(ctx, index):
@@ -854,6 +879,31 @@ async def disable_ospf(ctx, index):
         net_connect.disconnect()
 
 @bot.command()
+async def show_ospf(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show ip ospf neighbor')
+        await ctx.send('```'+output+'```')
+        net_connect.disconnect()
+
+@bot.command()
 async def rip(ctx, index, networks):
     global net_connect
     discord_username = str(ctx.author)
@@ -957,6 +1007,31 @@ async def disable_rip(ctx, index):
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value="RIP has been disabled.", inline=False)
         await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def show_rip(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show ip route')
+        await ctx.send('```'+output+'```')
         net_connect.disconnect()
 
 @bot.command()
@@ -1074,6 +1149,31 @@ async def disable_eigrp(ctx, index, asn):
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value="EIGRP has been disabled.", inline=False)
         await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def show_eigrp(ctx, index, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show ip eigrp neighbor')
+        await ctx.send('```'+output+'```')
         net_connect.disconnect()
 
 @bot.command()
@@ -1242,6 +1342,31 @@ async def disable_bgp(ctx, index, asn):
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value="BGP has been disabled.", inline=False)
         await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def show_bgp(ctx, index, asn):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show ip bgp summary')
+        await ctx.send('```'+output+'```')
         net_connect.disconnect()
 
 
