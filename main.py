@@ -297,7 +297,9 @@ async def save_config(ctx, index):
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('wr')
-        await ctx.send('```Configuration has been saved!```')
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="Configuration has been saved!", inline=False)
+        await ctx.send(embed=embed)
         net_connect.disconnect()
 
 @bot.command()
