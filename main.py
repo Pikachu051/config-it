@@ -112,7 +112,8 @@ async def command_list(ctx):
     embed = discord.Embed(title="Help", description="List of available commands", color=0x00ff00)
     embed.add_field(name="!create_connection <ip> <username> <password>", value="Add a device to connection list", inline=False)
     embed.add_field(name="!show_connection", value="Show all connected devices", inline=False)
-    embed.add_field(name="!ping <ip>", value="Ping an IP address", inline=False)
+    embed.add_field(name="!ping <ip_dest>", value="Ping an IP address", inline=False)
+    embed.add_field(name="!show_hostname", value="Show hostname of a device", inline=False)
     embed.add_field(name="!show_int", value="Show interface status", inline=False)
     embed.add_field(name="!show_vlan", value="Show VLAN information", inline=False)
     embed.add_field(name="!show_run", value="Show running configuration", inline=False)
@@ -123,14 +124,33 @@ async def command_list(ctx):
     embed.add_field(name="!ip_route <dest_ip> <dest_mark> <next_hop>", value="Add IP route", inline=False)
     embed.add_field(name="!show_spanning_tree", value="Show spanning tree information", inline=False)
     embed.add_field(name="!banner <str>", value="Set banner message", inline=False)
-    embed.add_field(name="!create_vlan <id>", value="Create a new VLAN", inline=False)
-    embed.add_field(name="!vlan_ip_add <vlan> <ip_addr> <netmask>", value="Add IP address to VLAN", inline=False)
-    embed.add_field(name="!vlan_no_shut <id>", value="No shutdown VLAN", inline=False)
+    embed.add_field(name="!create_vlan <vlan_number>", value="Create a new VLAN", inline=False)
+    embed.add_field(name="!vlan_ip_add <vlan_number> <ip_addr> <netmask>", value="Add IP address to VLAN", inline=False)
+    embed.add_field(name="!vlan_no_shut <vlan_number>", value="No shutdown VLAN", inline=False)
+    embed.add_field(name="!delete_vlan <vlan_number>", value="Delete VLAN", inline=False)
     embed.add_field(name="!int_ip_add <interface> <ip> <mask>", value="Add IP address to interface", inline=False)
     embed.add_field(name="!int_ip_gateway_add <ip_gateway>", value="Set default gateway", inline=False)
+    embed.add_field(name="!delete_gateway <ip_gateway>", value="Delete default gateway", inline=False)
     embed.add_field(name="!int_switch_mode <interface> <mode>", value="Set interface switchport mode", inline=False)
     embed.add_field(name="!int_no_shut <interface>", value="No shutdown interface", inline=False)
     embed.add_field(name="!int_shut <interface>", value="Shutdown interface", inline=False)
+    embed.add_field(name="", value="", inline=False)
+    embed.add_field(name="!rip <network>", value="Create/Add RIP network", inline=False)
+    embed.add_field(name="!remove_rip_nw <network>", value="Remove RIP network", inline=False)
+    embed.add_field(name="!disable_rip", value="Disable RIP Routing Protocol", inline=False)
+    embed.add_field(name="", value="", inline=False)
+    embed.add_field(name="!ospf <network>", value="Create/Add OSPF network", inline=False)
+    embed.add_field(name="!remove_ospf_nw <network>", value="Remove OSPF network", inline=False)
+    embed.add_field(name="!disable_ospf", value="Disable OSPF Routing Protocol", inline=False)
+    embed.add_field(name="", value="", inline=False)
+    embed.add_field(name="!eigrp <network>", value="Create/Add EIGRP network", inline=False)
+    embed.add_field(name="!remove_eigrp_nw <network>", value="Remove EIGRP network", inline=False)
+    embed.add_field(name="!disable_eigrp", value="Disable EIGRP Routing Protocol", inline=False)
+    embed.add_field(name="", value="", inline=False)
+    embed.add_field(name="!bgp <network>", value="Create/Add BGP network", inline=False)
+    embed.add_field(name="!remove_bgp_nw <network>", value="Remove BGP network", inline=False)
+    embed.add_field(name="!remove_bgp_neighbor <neighbor>", value="Remove BGP neighbor", inline=False)
+    embed.add_field(name="!disable_bgp", value="Disable BGP Routing Protocol", inline=False)
     
     mention = ctx.author.mention
     await ctx.author.send(embed=embed)
@@ -537,6 +557,31 @@ async def vlan_no_shut(ctx, index, id):
         net_connect.disconnect()
 
 @bot.command()
+async def delete_vlan(ctx, index, id):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        configs = ['no vlan ' + id]
+        net_connect.send_config_set(configs)
+        await ctx.send(f'```VLAN {id} has been deleted.```')
+        net_connect.disconnect()
+
+@bot.command()
 async def int_ip_add(ctx, index, interface, ip, mask):
     global net_connect
     discord_username = str(ctx.author)
@@ -555,16 +600,16 @@ async def int_ip_add(ctx, index, interface, ip, mask):
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
-        # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['int ' + interface,
+                   'no ip add',
                    'ip add ' + ip + ' ' + mask]
         net_connect.send_config_set(configs)
         await ctx.send(f'```IP Address {ip} and Subnet Mask {mask} has been added to Interface {interface}```')
         net_connect.disconnect()
 
 @bot.command()
-async def int_ip_gateway_add(ctx, index, ip_gateway):
+async def ip_gateway_add(ctx, index, ip_gateway):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -587,6 +632,31 @@ async def int_ip_gateway_add(ctx, index, ip_gateway):
         configs = ['ip default-gateway ' + ip_gateway]
         net_connect.send_config_set(configs)
         await ctx.send(f'```IP Default Gateway {ip_gateway} has been set on the device.```')
+        net_connect.disconnect()
+
+@bot.command()
+async def delete_gateway(ctx, index, ip_gateway):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        configs = ['no ip default-gateway ' + ip_gateway]
+        net_connect.send_config_set(configs)
+        await ctx.send(f'```IP Default Gateway {ip_gateway} has been deleted.```')
         net_connect.disconnect()
 
 @bot.command()
