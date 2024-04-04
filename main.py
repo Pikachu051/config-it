@@ -121,15 +121,15 @@ async def command_list(ctx):
     embed.add_field(name="!save_config", value="Save running configuration", inline=False)
     embed.add_field(name="!hostname <hostname>", value="Set device hostname", inline=False)
     embed.add_field(name="!show_route", value="Show IP routing table", inline=False)
-    embed.add_field(name="!ip_route <dest_ip> <dest_mark> <next_hop>", value="Add IP route", inline=False)
+    embed.add_field(name="!create_route <dest_ip> <dest_mark> <next_hop>", value="Add IP route", inline=False)
     embed.add_field(name="!show_spanning_tree", value="Show spanning tree information", inline=False)
     embed.add_field(name="!banner <str>", value="Set banner message", inline=False)
     embed.add_field(name="!create_vlan <vlan_number>", value="Create a new VLAN", inline=False)
     embed.add_field(name="!vlan_ip_add <vlan_number> <ip_addr> <netmask>", value="Add IP address to VLAN", inline=False)
     embed.add_field(name="!vlan_no_shut <vlan_number>", value="No shutdown VLAN", inline=False)
     embed.add_field(name="!delete_vlan <vlan_number>", value="Delete VLAN", inline=False)
-    embed.add_field(name="!int_ip_add <interface> <ip> <mask>", value="Add IP address to interface", inline=False)
-    embed.add_field(name="!int_ip_gateway_add <ip_gateway>", value="Set default gateway", inline=False)
+    embed.add_field(name="!int_ip_add <interface> <ip> <mask>", value="Add/Replace IP address to interface", inline=False)
+    embed.add_field(name="!add!gateway <ip_gateway>", value="Set default gateway", inline=False)
     embed.add_field(name="!delete_gateway <ip_gateway>", value="Delete default gateway", inline=False)
     embed.add_field(name="!int_switch_mode <interface> <mode>", value="Set interface switchport mode", inline=False)
     embed.add_field(name="!int_no_shut <interface>", value="No shutdown interface", inline=False)
@@ -398,7 +398,7 @@ async def show_route(ctx, index):
         net_connect.disconnect()
         
 @bot.command()
-async def ip_route(ctx , index, dest_ip, dest_mark, next_hop):
+async def create_route(ctx , index, dest_ip, dest_mark, next_hop):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -609,7 +609,7 @@ async def int_ip_add(ctx, index, interface, ip, mask):
         net_connect.disconnect()
 
 @bot.command()
-async def ip_gateway_add(ctx, index, ip_gateway):
+async def add_gateway(ctx, index, ip_gateway):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
