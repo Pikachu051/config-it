@@ -8,6 +8,7 @@ from ospf import ospf, remove_ospf_nw, disable_ospf
 from rip import rip, remove_rip_nw, disable_rip
 from bgp import bgp, remove_bgp_nw, remove_bgp_neighbor, disable_bgp
 from eigrp import eigrp, remove_eigrp_nw, disable_eigrp
+from help_pages import get_help_page
 
 
 load_dotenv()
@@ -109,53 +110,41 @@ async def connect(ctx, device_index: int = None):
 
 @bot.command()
 async def command_list(ctx):
-    embed = discord.Embed(title="Help", description="List of available commands", color=0x00ff00)
-    embed.add_field(name="!create_connection <ip> <username> <password>", value="Add a device to connection list", inline=False)
-    embed.add_field(name="!show_connection", value="Show all connected devices", inline=False)
-    embed.add_field(name="!ping <ip_dest>", value="Ping an IP address", inline=False)
-    embed.add_field(name="!show_hostname", value="Show hostname of a device", inline=False)
-    embed.add_field(name="!show_int", value="Show interface status", inline=False)
-    embed.add_field(name="!show_vlan", value="Show VLAN information", inline=False)
-    embed.add_field(name="!show_run", value="Show running configuration", inline=False)
-    embed.add_field(name="!show_run_int <interface>", value="Show interface configuration", inline=False)
-    embed.add_field(name="!save_config", value="Save running configuration", inline=False)
-    embed.add_field(name="!hostname <hostname>", value="Set device hostname", inline=False)
-    embed.add_field(name="!show_route", value="Show IP routing table", inline=False)
-    embed.add_field(name="!create_route <dest_ip> <dest_mark> <next_hop>", value="Add IP route", inline=False)
-    embed.add_field(name="!show_spanning_tree", value="Show spanning tree information", inline=False)
-    embed.add_field(name="!banner <str>", value="Set banner message", inline=False)
-    embed.add_field(name="!create_vlan <vlan_number>", value="Create a new VLAN", inline=False)
-    embed.add_field(name="!vlan_ip_add <vlan_number> <ip_addr> <netmask>", value="Add IP address to VLAN", inline=False)
-    embed.add_field(name="!vlan_no_shut <vlan_number>", value="No shutdown VLAN", inline=False)
-    embed.add_field(name="!delete_vlan <vlan_number>", value="Delete VLAN", inline=False)
-    embed.add_field(name="!int_ip_add <interface> <ip> <mask>", value="Add/Replace IP address to interface", inline=False)
-    embed.add_field(name="!add!gateway <ip_gateway>", value="Set default gateway", inline=False)
-    embed.add_field(name="!delete_gateway <ip_gateway>", value="Delete default gateway", inline=False)
-    embed.add_field(name="!int_switch_mode <interface> <mode>", value="Set interface switchport mode", inline=False)
-    embed.add_field(name="!int_no_shut <interface>", value="No shutdown interface", inline=False)
-    embed.add_field(name="!int_shut <interface>", value="Shutdown interface", inline=False)
-    embed.add_field(name="", value="", inline=False)
-    embed.add_field(name="!rip <network>", value="Create/Add RIP network", inline=False)
-    embed.add_field(name="!remove_rip_nw <network>", value="Remove RIP network", inline=False)
-    embed.add_field(name="!disable_rip", value="Disable RIP Routing Protocol", inline=False)
-    embed.add_field(name="", value="", inline=False)
-    embed.add_field(name="!ospf <network>", value="Create/Add OSPF network", inline=False)
-    embed.add_field(name="!remove_ospf_nw <network>", value="Remove OSPF network", inline=False)
-    embed.add_field(name="!disable_ospf", value="Disable OSPF Routing Protocol", inline=False)
-    embed.add_field(name="", value="", inline=False)
-    embed.add_field(name="!eigrp <network>", value="Create/Add EIGRP network", inline=False)
-    embed.add_field(name="!remove_eigrp_nw <network>", value="Remove EIGRP network", inline=False)
-    embed.add_field(name="!disable_eigrp", value="Disable EIGRP Routing Protocol", inline=False)
-    embed.add_field(name="", value="", inline=False)
-    embed.add_field(name="!bgp <network>", value="Create/Add BGP network", inline=False)
-    embed.add_field(name="!remove_bgp_nw <network>", value="Remove BGP network", inline=False)
-    embed.add_field(name="!remove_bgp_neighbor <neighbor>", value="Remove BGP neighbor", inline=False)
-    embed.add_field(name="!disable_bgp", value="Disable BGP Routing Protocol", inline=False)
-    
     mention = ctx.author.mention
-    await ctx.author.send(embed=embed)
+    channel = await ctx.author.create_dm()
+    message = await channel.send(embed=get_help_page(1))
+    await message.add_reaction('⬅️')
+    await message.add_reaction('➡️')
     await ctx.send(f'{mention}'+'``` Command lists sent to your DM!```')
-    
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    message_id = payload.message_id
+    message = await bot.get_channel(payload.channel_id).fetch_message(message_id)
+    page = 1
+    if "Help (1/5)" in message.embeds[0].title:
+        page = 1
+    elif "Help (2/5)" in message.embeds[0].title:
+        page = 2
+    elif "Help (3/5)" in message.embeds[0].title:
+        page = 3
+    elif "Help (4/5)" in message.embeds[0].title:
+        page = 4
+    elif "Help (5/5)" in message.embeds[0].title:
+        page = 5
+    if str(payload.emoji) == '⬅️':
+        # await message.remove_reaction('⬅️', payload.member)
+        if page == 1:
+            await message.edit(embed=get_help_page(5))
+        else:
+            await message.edit(embed=get_help_page(page-1))
+    elif str(payload.emoji) == '➡️':
+        # await message._remove_reaction('➡️', payload.member)
+        if page == 5:
+            await message.edit(embed=get_help_page(1))
+        else:
+            await message.edit(embed=get_help_page(page+1))
+
 @bot.command()
 async def show_connection(ctx):
     discord_username = str(ctx.author)
