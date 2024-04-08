@@ -544,6 +544,32 @@ async def vlan_ip_add(ctx, index, vlan, ip_addr, netmask):
         net_connect.disconnect()
 
 @bot.command()
+async def vlan_ip_delete(ctx, index, vlan, ip_addr, netmask):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        configs = ['int ' + vlan,
+                   'no ip add ' + ip_addr + ' ' + netmask]
+        net_connect.send_config_set(configs)
+        await ctx.send(f'```IP Address {ip_addr} and Subnet Mask {netmask} has been deleted from VLAN {vlan}.```')
+        net_connect.disconnect()
+
+@bot.command()
 async def vlan_no_shut(ctx, index, id):
     global net_connect
     discord_username = str(ctx.author)
@@ -1408,6 +1434,6 @@ async def show_cdp_neighbors(ctx, index):
         output = net_connect.send_command('show cdp neighbors')
         await ctx.send('```'+output+'```')
         net_connect.disconnect()
-    
-bot.run(TOKEN)
 
+
+bot.run(TOKEN)
