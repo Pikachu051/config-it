@@ -1359,5 +1359,55 @@ async def show_bgp(ctx, index, asn):
         net_connect.disconnect()
 
 
+@bot.command()
+async def show_mac_table(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show mac-address-table')
+        await ctx.send('```'+output+'```')
+        net_connect.disconnect()
+        
+@bot.command()
+async def show_cdp_neighbors(ctx, index):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        output = net_connect.send_command('show cdp neighbors')
+        await ctx.send('```'+output+'```')
+        net_connect.disconnect()
+    
 bot.run(TOKEN)
 
