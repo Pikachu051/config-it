@@ -40,10 +40,3 @@ def remove_bgp_neighbor(neighbors, asn):
 
 def disable_bgp(asn):
     return ['no router bgp ' + asn]
-
-nw = "10.0.15.1/24,10.0.15.2/24"
-neighbor = "10.0.12.1:100"
-asn = "300"
-print(bgp(nw, neighbor, asn))
-print(remove_bgp_nw(nw, asn))
-print(remove_bgp_neighbor(neighbor, asn))

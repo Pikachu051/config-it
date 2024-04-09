@@ -298,7 +298,13 @@ async def show_run_int(ctx, index, interface):
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show run int ' + interface)
-        await ctx.send('```'+output+'```')
+        if "Invalid" in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid Interface.", inline=False)
+            net_connect.disconnect()
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send('```'+output+'```')
         net_connect.disconnect()
 
 @bot.command()
@@ -424,7 +430,8 @@ async def create_route(ctx , index, dest_ip, dest_mark, next_hop):
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
-        output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
+        command_list = ['ip route ' + dest_ip + ' ' + dest_mark + ' ' + next_hop]
+        output = net_connect.send_config_set(command_list)
         await ctx.send('```Route has been added!```')
         net_connect.disconnect()
 
@@ -483,7 +490,7 @@ async def show_spanning_tree(ctx, index):
         net_connect.disconnect()
 
 @bot.command()
-async def banner(ctx, index, str):
+async def banner(ctx, index, text):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -503,7 +510,11 @@ async def banner(ctx, index, str):
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
-        output = net_connect.send_command(f'banner motd # {str} #')
+        if "#" in text:
+            command_list = ['banner motd = ' + text + ' =']
+        else:
+            command_list = ['banner motd # ' + text + ' #']
+        output = net_connect.send_config_set(command_list)
         await ctx.send('```Banner has been set!```')
         net_connect.disconnect()
 
@@ -561,7 +572,7 @@ async def vlan_ip_add(ctx, index, vlan, ip_addr, netmask):
         net_connect.disconnect()
 
 @bot.command()
-async def vlan_ip_delete(ctx, index, vlan, ip_addr, netmask):
+async def vlan_ip_delete(ctx, index, vlan):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -581,9 +592,9 @@ async def vlan_ip_delete(ctx, index, vlan, ip_addr, netmask):
         embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         configs = ['int ' + vlan,
-                   'no ip add ' + ip_addr + ' ' + netmask]
+                   'no ip add']
         net_connect.send_config_set(configs)
-        await ctx.send(f'```IP Address {ip_addr} and Subnet Mask {netmask} has been deleted from VLAN {vlan}.```')
+        await ctx.send(f'```IP Address and Subnet Mask has been deleted from VLAN {vlan}.```')
         net_connect.disconnect()
 
 @bot.command()
@@ -661,8 +672,15 @@ async def int_ip_add(ctx, index, interface, ip, mask):
         configs = ['int ' + interface,
                    'no ip add',
                    'ip add ' + ip + ' ' + mask]
-        net_connect.send_config_set(configs)
-        await ctx.send(f'```IP Address {ip} and Subnet Mask {mask} has been added to Interface {interface}```')
+        output = net_connect.send_config_set(configs)
+        if "Invalid" in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid Interface or IP Address or Subnet Mask.", inline=False)
+            net_connect.disconnect()
+            await ctx.send(embed=embed)
+            return
+        else:
+            await ctx.send(f'```IP Address {ip} and Subnet Mask {mask} has been added to Interface {interface}```')
         net_connect.disconnect()
 
 @bot.command()
@@ -739,8 +757,16 @@ async def int_switch_mode(ctx, index, interface, mode):
     else:
         mode = mode.lower()
         configs = ['int ' + interface,
-                       'switchport mode ' + mode]
-        net_connect.send_config_set(configs)
+                    'switchport mode ' + mode]
+        output = net_connect.send_config_set(configs)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="Invalid device or input or interface doesn't exist!", value="", inline=False)
+            embed.add_field(name="", value="This command is not supported on router!", inline=False)
+            embed.add_field(name="", value="Usage: **!int_switch_mode <device_index> <interface> <mode>**", inline=False)
+            await ctx.send(embed=embed)
+            net_connect.disconnect()
+            return
         if mode == 'access':
             await ctx.send(f'```Changed {interface} to switchport mode access successfully!```')
         elif mode == 'trunk':
@@ -748,7 +774,7 @@ async def int_switch_mode(ctx, index, interface, mode):
         net_connect.disconnect()
 
 @bot.command()
-async def int_switch_access_vlan(ctx, index, interface, vlan_id):
+async def int_access_vlan(ctx, index, interface, vlan_id):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -770,7 +796,15 @@ async def int_switch_access_vlan(ctx, index, interface, vlan_id):
     else:
         configs = ['int ' + interface,
                    'switchport access vlan ' + vlan_id]
-        net_connect.send_config_set(configs)
+        output = net_connect.send_config_set(configs)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="Invalid input or interface doesn't exist!", value="", inline=False)
+            embed.add_field(name="", value="This command is not supported on router!", inline=False)
+            embed.add_field(name="", value="Usage: **!int_access_vlan <device_index> <interface> <vlan_id>**", inline=False)
+            await ctx.send(embed=embed)
+            net_connect.disconnect()
+            return
         await ctx.send(f'```Interface {interface} is now accessed in VLAN {vlan_id}!```')
         net_connect.disconnect()
 
@@ -797,7 +831,14 @@ async def int_no_shut(ctx,index, interface):
     else:
         configs = ['int ' + interface,
                    'no shut']
-        net_connect.send_config_set(configs)
+        output = net_connect.send_config_set(configs)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="Invalid input or interface doesn't exist!", value="", inline=False)
+            embed.add_field(name="", value="Usage: **!int_no_shut <device_index> <interface>**", inline=False)
+            await ctx.send(embed=embed)
+            net_connect.disconnect()
+            return
         await ctx.send(f'```Interface {interface} is now no shutdown.```')
         net_connect.disconnect()
 
@@ -824,7 +865,14 @@ async def int_shut(ctx,index, interface):
     else:
         configs = ['int ' + interface,
                    'shut']
-        net_connect.send_config_set(configs)
+        output = net_connect.send_config_set(configs)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="Invalid input or interface doesn't exist!", value="", inline=False)
+            embed.add_field(name="", value="Usage: **!int_shut <device_index> <interface>**", inline=False)
+            await ctx.send(embed=embed)
+            net_connect.disconnect()
+            return
         await ctx.send(f'```Interface {interface} is now shuted down.```')
         net_connect.disconnect()
 
@@ -853,7 +901,7 @@ async def ospf(ctx, index, networks):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!ospf <index> <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!ospf <device_index> <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -903,7 +951,7 @@ async def remove_ospf_nw(ctx, index, networks):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!remove_ospf_nw <index> <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_ospf_nw <device_index> <network_ip/netmask(1-32)/area,network_ip2/netmask2(1-32)/area2>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -965,7 +1013,7 @@ async def show_ospf(ctx, index):
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
-        output = net_connect.send_command('show ip ospf neighbor')
+        output = net_connect.send_command('show ip ospf database')
         if "" == output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="- OSPF is not setup yet.", inline=False)
@@ -1000,7 +1048,7 @@ async def rip(ctx, index, networks):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!rip <network_ip,network_ip2>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!rip <device_index> <network_ip,network_ip2>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -1041,7 +1089,7 @@ async def remove_rip_nw(ctx, index, networks):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!remove_rip_nw <network_ip,network_ip2>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_rip_nw <device_index> <network_ip,network_ip2>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -1140,7 +1188,7 @@ async def eigrp(ctx, index, networks, asn):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!eigrp <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!eigrp <device_index> <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -1193,7 +1241,7 @@ async def remove_eigrp_nw(ctx, index, networks, asn):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!remove_eigrp_nw <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!remove_eigrp_nw <device_index> <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <as>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -1264,6 +1312,8 @@ async def show_eigrp(ctx, index):
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show ip eigrp topology')
+        output += "\n\n"
+        output += net_connect.send_command('show ip eigrp neighbors')
         if "" == output:
             embed = discord.Embed(title="No result", color=0xff0000)
             embed.add_field(name="", value="- EIGRP is not setup yet.", inline=False)
@@ -1299,7 +1349,7 @@ async def bgp(ctx, index, networks, neighbors, asn):
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
             embed.add_field(name="", value="Invalid input!", inline=False)
-            embed.add_field(name="", value="Usage: **!bgp <index> <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <neighbor_ip:neighbor_as> <as>**.", inline=False)
+            embed.add_field(name="", value="Usage: **!bgp <device_index> <network_ip/netmask(1-32),network_ip2/netmask2(1-32)> <neighbor_ip:neighbor_as> <as>**.", inline=False)
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
@@ -1442,7 +1492,7 @@ async def disable_bgp(ctx, index, asn):
         net_connect.disconnect()
 
 @bot.command()
-async def show_bgp(ctx, index, asn):
+async def show_bgp(ctx, index):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -1462,7 +1512,7 @@ async def show_bgp(ctx, index, asn):
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
-        output = net_connect.send_command('show ip bgp summary')
+        output = net_connect.send_command('show ip bgp')
         if "" == output:
             embed = discord.Embed(title="No result", color=0xff0000)
             embed.add_field(name="", value="- BGP is not setup yet.", inline=False)
@@ -1494,7 +1544,13 @@ async def show_mac_table(ctx, index):
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
-        output = net_connect.send_command('show mac-address-table')
+        output = net_connect.send_command('show mac address-table')
+        if "Invalid" in output:
+            embed = discord.Embed(title="Not supported", color=0xff0000)
+            embed.add_field(name="", value="- This command is not supported on router.", inline=False)
+            await ctx.send(embed=embed)
+            net_connect.disconnect()
+            return
         await ctx.send('```'+output+'```')
         net_connect.disconnect()
         
@@ -1525,9 +1581,10 @@ async def int_ip_delete(ctx, index, interface):
         output = net_connect.send_config_set(command_list)
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
-            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Invalid input or interface doesn't exist!", inline=False)
             embed.add_field(name="", value="Usage: **!int_ip_delete <device_index> <interface>**.", inline=False)
             await ctx.send(embed=embed)
+            net_connect.disconnect()
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value="The IP Address has been removed from the interface.", inline=False)
@@ -1599,9 +1656,10 @@ async def router_on_a_stick(ctx, index, interface, vlan_id, ip_address, subnet_m
         output = net_connect.send_config_set(command_list)
         if 'Invalid' in output:
             embed = discord.Embed(title="Error", color=0xff0000)
-            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Invalid input or interface doesn't exist!", inline=False)
             embed.add_field(name="", value="Usage: **!router_on_a_stick <device_index> <interface> <vlan_id> <ip_address> <subnet_mask>**.", inline=False)
             await ctx.send(embed=embed)
+            net_connect.disconnect()
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
         embed.add_field(name="", value="Router on a stick has been configured.", inline=False)
