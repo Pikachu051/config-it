@@ -58,7 +58,7 @@ embed4.add_field(name="!int_ip_delete", value="Delete IP from the specified inte
 
 embed5 = discord.Embed(title="Help (5/5)", description="List of available commands:", color=0x00ff00)
 embed5.add_field(name="!Show_cbp_neighbor", value="Show CDP neighbor", inline=False)
-embed5.add_field(name="!Show_mac_table", value="Show macaddress table", inline=False)
+embed5.add_field(name="!Show_mac_table", value="Show MAC Address table", inline=False)
 embed5.add_field(name="!vlan_shut", value="Shutdown VLAN", inline=False)
 embed5.add_field(name="!router_on_a_stick", value="Create sub-interface on a router", inline=False)
 
