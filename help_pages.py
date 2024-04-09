@@ -57,12 +57,10 @@ embed4.add_field(name="!vlan_ip_delete", value="Delete IP from the specified VLA
 embed4.add_field(name="!int_ip_delete", value="Delete IP from the specified interface", inline=False)
 
 embed5 = discord.Embed(title="Help (5/5)", description="List of available commands:", color=0x00ff00)
-embed5.add_field(name="!Show_cbp_neighbor", value="Show CDP neighbor", inline=False)
+embed5.add_field(name="!int_access_vlan", value="Assign a specific VLAN to an interface.", inline=False)
 embed5.add_field(name="!Show_mac_table", value="Show MAC Address table", inline=False)
 embed5.add_field(name="!vlan_shut", value="Shutdown VLAN", inline=False)
 embed5.add_field(name="!router_on_a_stick", value="Create sub-interface on a router", inline=False)
-
-
 
 
 pages = [embed1, embed2, embed3, embed4, embed5]
