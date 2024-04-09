@@ -85,28 +85,5 @@ async def vlan_no_shut(ctx, id):
 # ========================================================================================
 # 4/1/2024
 
-'''
-@bot.command()
-async def router_rip(ctx, index, network):
-    global net_connect
-    discord_username = str(ctx.author)
-    key = f"{discord_username}:{index}"
-    if key not in connections:
-        no_index_exists()
-        return
-    net_connect = await connect(ctx, index)
-
-    if net_connect == None:
-        embed = discord.Embed(title="Error", color=0xff0000)
-        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
-        # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
-    else:
-        configs = ['router rip', 'version 2', 'no auto-summary']
-        networks = network.split(',')
-        for network in networks:
-            configs.append('network ' + network)
-        return configs
-'''
 bot.run(TOKEN)
 
