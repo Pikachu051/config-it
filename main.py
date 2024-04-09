@@ -748,6 +748,33 @@ async def int_switch_mode(ctx, index, interface, mode):
         net_connect.disconnect()
 
 @bot.command()
+async def int_switch_access_vlan(ctx, index, interface, vlan_id):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
+        # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
+    else:
+        configs = ['int ' + interface,
+                   'switchport access vlan ' + vlan_id]
+        net_connect.send_config_set(configs)
+        await ctx.send(f'```Interface {interface} is now accessed in VLAN {vlan_id}!```')
+        net_connect.disconnect()
+
+@bot.command()
 async def int_no_shut(ctx,index, interface):
     global net_connect
     discord_username = str(ctx.author)
@@ -1471,30 +1498,6 @@ async def show_mac_table(ctx, index):
         await ctx.send('```'+output+'```')
         net_connect.disconnect()
         
-@bot.command()
-async def show_cdp_neighbors(ctx, index):
-    global net_connect
-    discord_username = str(ctx.author)
-    key = f"{discord_username}:{index}"
-    if key not in connections:
-        no_index_exists()
-        return
-
-    try:
-        net_connect = await connect(ctx, index)
-    except:
-        embed = discord.Embed(title="Error", color=0xff0000)
-        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
-        return
-
-    if net_connect == None:
-        embed = discord.Embed(title="Error", color=0xff0000)
-        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
-    else:
-        output = net_connect.send_command('show cdp neighbors')
-        await ctx.send('```'+output+'```')
-        net_connect.disconnect()
 
 @bot.command()
 async def int_ip_delete(ctx, index, interface):
@@ -1532,7 +1535,7 @@ async def int_ip_delete(ctx, index, interface):
         net_connect.disconnect()
 
 @bot.command()
-async def vlan_shut(ctx, index, vlan_id):
+async def vlan_shut(ctx, index, vlan):
     global net_connect
     discord_username = str(ctx.author)
     key = f"{discord_username}:{index}"
@@ -1552,7 +1555,7 @@ async def vlan_shut(ctx, index, vlan_id):
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
         embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
-        command_list = ['int vlan ' + vlan_id,
+        command_list = ['int vlan ' + vlan,
                         'shut']
         output = net_connect.send_config_set(command_list)
         if 'Invalid' in output:
@@ -1562,7 +1565,7 @@ async def vlan_shut(ctx, index, vlan_id):
             await ctx.send(embed=embed)
             return
         embed = discord.Embed(title="Success", color=0x00ff00)
-        embed.add_field(name="", value="The VLAN " + vlan_id + " has been shutdown.", inline=False)
+        embed.add_field(name="", value="The VLAN " + vlan + " has been shutdown.", inline=False)
         await ctx.send(embed=embed)
         net_connect.disconnect()
 
