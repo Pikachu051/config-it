@@ -178,7 +178,7 @@ async def ping(ctx, index, ip):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         await ctx.send(embed=embed)
     else:
         cmd_list = ['ping ' + ip,
@@ -208,7 +208,7 @@ async def show_int(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         await ctx.send(embed=embed)
         # await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
@@ -229,7 +229,7 @@ async def show_vlan(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('```You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.```')
     else:
         output = net_connect.send_command('show vlan brief')
@@ -252,7 +252,7 @@ async def show_run(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show run')
@@ -277,7 +277,7 @@ async def show_run_int(ctx, index, interface):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show run int ' + interface)
@@ -302,7 +302,7 @@ async def save_config(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('wr')
@@ -329,7 +329,7 @@ async def hostname(ctx, index, hostname):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         command_list = ['hostname ' + hostname]
@@ -354,7 +354,7 @@ async def show_hostname(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show run | include hostname')
         output = output.split(' ')[1]
@@ -379,7 +379,7 @@ async def show_route(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show ip route')
@@ -404,7 +404,7 @@ async def create_route(ctx , index, dest_ip, dest_mark, next_hop):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command(f'ip route {dest_ip} {dest_mark} {next_hop}')
@@ -429,7 +429,7 @@ async def delete_route(ctx, index, dest_ip, dest_mark, next_hop):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command(f'no ip route {dest_ip} {dest_mark} {next_hop}')
@@ -454,7 +454,7 @@ async def show_spanning_tree(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command('show spanning-tree')
@@ -483,7 +483,7 @@ async def banner(ctx, index, str):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         output = net_connect.send_command(f'banner motd # {str} #')
@@ -508,7 +508,7 @@ async def create_vlan(ctx, index, id):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['vlan ' + id]
@@ -534,7 +534,7 @@ async def vlan_ip_add(ctx, index, vlan, ip_addr, netmask):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['int ' + vlan,
@@ -561,7 +561,7 @@ async def vlan_no_shut(ctx, index, id):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['vlan ' + id,
@@ -588,7 +588,7 @@ async def delete_vlan(ctx, index, id):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         configs = ['no vlan ' + id]
         net_connect.send_config_set(configs)
@@ -613,7 +613,7 @@ async def int_ip_add(ctx, index, interface, ip, mask):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         configs = ['int ' + interface,
                    'no ip add',
@@ -640,7 +640,7 @@ async def add_gateway(ctx, index, ip_gateway):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['ip default-gateway ' + ip_gateway]
@@ -666,7 +666,7 @@ async def delete_gateway(ctx, index, ip_gateway):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         configs = ['no ip default-gateway ' + ip_gateway]
         net_connect.send_config_set(configs)
@@ -691,7 +691,7 @@ async def int_switch_mode(ctx, index, interface, mode):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         mode = mode.lower()
@@ -722,7 +722,7 @@ async def int_no_shut(ctx,index, interface):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['int ' + interface,
@@ -749,7 +749,7 @@ async def int_shut(ctx,index, interface):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
         # await ctx.send('You need to connect to a device first!\n\nUse !connect <ip> <username> <password> to connect to a device.')
     else:
         configs = ['int ' + interface,
@@ -776,7 +776,7 @@ async def ospf(ctx, index, networks):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = ospf(networks)
         output = net_connect.send_config_set(commands)
@@ -818,7 +818,7 @@ async def remove_ospf_nw(ctx, index, networks):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = remove_ospf_nw(networks)
         output = net_connect.send_config_set(commands)
@@ -858,7 +858,7 @@ async def disable_ospf(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = disable_ospf()
         output = net_connect.send_config_set(commands)
@@ -886,7 +886,7 @@ async def show_ospf(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show ip ospf neighbor')
         await ctx.send('```'+output+'```')
@@ -910,7 +910,7 @@ async def rip(ctx, index, networks):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = rip(networks)
         print(commands)
@@ -950,7 +950,7 @@ async def remove_rip_nw(ctx, index, networks):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = remove_rip_nw(networks)
         output = net_connect.send_config_set(commands)
@@ -989,7 +989,7 @@ async def disable_rip(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = disable_rip()
         output = net_connect.send_config_set(commands)
@@ -1017,7 +1017,7 @@ async def show_rip(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show ip route')
         await ctx.send('```'+output+'```')
@@ -1041,7 +1041,7 @@ async def eigrp(ctx, index, networks, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = eigrp(networks, asn)
         output = net_connect.send_config_set(commands)
@@ -1084,7 +1084,7 @@ async def remove_eigrp_nw(ctx, index, networks, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = remove_eigrp_nw(networks, asn)
         output = net_connect.send_config_set(commands)
@@ -1125,7 +1125,7 @@ async def disable_eigrp(ctx, index, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = disable_eigrp(asn)
         output = net_connect.send_config_set(commands)
@@ -1159,7 +1159,7 @@ async def show_eigrp(ctx, index, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show ip eigrp neighbor')
         await ctx.send('```'+output+'```')
@@ -1184,7 +1184,7 @@ async def bgp(ctx, index, networks, neighbors, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = bgp(networks, neighbors, asn)
         output = net_connect.send_config_set(commands)
@@ -1236,7 +1236,7 @@ async def remove_bgp_nw(ctx, index, networks, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = remove_bgp_nw(networks, asn)
         output = net_connect.send_config_set(commands)
@@ -1277,7 +1277,7 @@ async def remove_bgp_neighbor(ctx, index, neighbors, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = remove_bgp_neighbor(neighbors, asn)
         output = net_connect.send_config_set(commands)
@@ -1318,7 +1318,7 @@ async def disable_bgp(ctx, index, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         commands = disable_bgp(asn)
         output = net_connect.send_config_set(commands)
@@ -1352,7 +1352,7 @@ async def show_bgp(ctx, index, asn):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show ip bgp summary')
         await ctx.send('```'+output+'```')
@@ -1378,7 +1378,7 @@ async def show_mac_table(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show mac-address-table')
         await ctx.send('```'+output+'```')
@@ -1403,11 +1403,122 @@ async def show_cdp_neighbors(ctx, index):
     if net_connect == None:
         embed = discord.Embed(title="Error", color=0xff0000)
         embed.add_field(name="", value="You need to connect to a device first!", inline=False)
-        embed.add_field(name="", value="Use **!create_connect <ip> <username> <password>** to connect to a device.", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
     else:
         output = net_connect.send_command('show cdp neighbors')
         await ctx.send('```'+output+'```')
         net_connect.disconnect()
+
+@bot.command()
+async def int_ip_delete(ctx, index, interface):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        command_list = ['int ' + interface,
+                        'no ip address']
+        output = net_connect.send_config_set(command_list)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!int_ip_delete <device_index> <interface>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The IP Address has been removed from the interface.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def vlan_shut(ctx, index, vlan_id):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        command_list = ['int vlan ' + vlan_id,
+                        'shut']
+        output = net_connect.send_config_set(command_list)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!vlan_shut <device_index> <vlan_id>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="The VLAN " + vlan_id + " has been shutdown.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+@bot.command()
+async def router_on_a_stick(ctx, index, interface, vlan_id, ip_address, subnet_mask):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+    
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+    
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        command_list = ['int ' + interface,
+                        'no shut',
+                        'exit',
+                        'int ' + interface + '.' + vlan_id,
+                        'encapsulation dot1Q ' + vlan_id,
+                        'ip address ' + ip_address + ' ' + subnet_mask,]
+        output = net_connect.send_config_set(command_list)
+        if 'Invalid' in output:
+            embed = discord.Embed(title="Error", color=0xff0000)
+            embed.add_field(name="", value="Invalid input!", inline=False)
+            embed.add_field(name="", value="Usage: **!router_on_a_stick <device_index> <interface> <vlan_id> <ip_address> <subnet_mask>**.", inline=False)
+            await ctx.send(embed=embed)
+            return
+        embed = discord.Embed(title="Success", color=0x00ff00)
+        embed.add_field(name="", value="Router on a stick has been configured.", inline=False)
+        await ctx.send(embed=embed)
+        net_connect.disconnect()
+
+
     
 bot.run(TOKEN)
 
