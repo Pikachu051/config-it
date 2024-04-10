@@ -9,6 +9,7 @@ from rip import rip as create_rip, remove_rip_nw as rm_rip_nw, disable_rip as di
 from bgp import bgp as create_bgp, remove_bgp_nw as rm_bgp_nw, remove_bgp_neighbor as rm_bgp_neighbor, disable_bgp as dis_bgp
 from eigrp import eigrp as create_eigrp, remove_eigrp_nw as rm_eigrp_nw, disable_eigrp as dis_eigrp
 from help_pages import get_help_page
+import pickle
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv("DISCORD_TOKEN")
@@ -18,6 +19,19 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 net_connect = None
 
 connections = {}
+
+try:
+    print("Loading user connections data...")
+    file_path = os.path.join(os.path.dirname(__file__), 'user-connections.pkl')
+    with open(file_path, 'rb') as f:
+        connections = pickle.load(f)
+    print("User connections data loaded successfully.")
+except (OSError, FileNotFoundError):
+    print("Failed to load user connections data. No data file found. Creating a new file...")
+    file_path = os.path.join(os.path.dirname(__file__), 'user-connections.pkl')
+    with open(file_path, 'wb') as f:
+        pickle.dump(connections, f)
+    print("New user connections data file created.")
 
 def no_index_exists():
     embed = discord.Embed(title="Error", color=0xff0000)
@@ -74,6 +88,14 @@ async def create_connection(ctx, ip, username, password):
         return
 
     connections[key] = [ip, username, password]
+
+    try:
+        file_path = os.path.join(os.path.dirname(__file__), 'user-connections.pkl')
+        with open(file_path, 'wb') as f:
+            pickle.dump(connections, f)
+    except:
+        print("Failed to save connections credentials. Please report the issue to the developer.")
+    
     await ctx.send(f"```Connection created for {discord_username} with device #{device_index}.```")
     print(connections)
 
