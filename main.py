@@ -1688,4 +1688,58 @@ async def router_on_a_stick(ctx, index, interface, vlan_id, ip_address, subnet_m
         await ctx.send(embed=embed)
         net_connect.disconnect()
 
+@bot.command()
+async def traceroute(ctx, index, ip_address, source_ip=None):
+    global net_connect
+    discord_username = str(ctx.author)
+    key = f"{discord_username}:{index}"
+    if key not in connections:
+        no_index_exists()
+        return
+
+    try:
+        net_connect = await connect(ctx, index)
+    except:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="Failed to connect to the device.", inline=False)
+        return
+
+    if net_connect == None:
+        embed = discord.Embed(title="Error", color=0xff0000)
+        embed.add_field(name="", value="You need to connect to a device first!", inline=False)
+        embed.add_field(name="", value="Use **!create_connection <ip> <username> <password>** to connect to a device.", inline=False)
+    else:
+        embed = discord.Embed(title="Traceroute", color=0x00ff00)
+        if source_ip:
+            embed.add_field(name="", value="Tracing the route to " + ip_address + " from " + source_ip, inline=False)
+            await ctx.send(embed=embed)
+            command_list = ['traceroute ' + ip_address + ' source ' + source_ip,
+                            '\n']
+            output = net_connect.send_multiline_timing(command_list)
+            if 'Invalid' in output:
+                embed = discord.Embed(title="Error", color=0xff0000)
+                embed.add_field(name="", value="Invalid input!", inline=False)
+                embed.add_field(name="", value="Traceroute command with source IP might not supported on this device. Try using **!traceroute** without providing source IP address.", inline=False)
+                embed.add_field(name="", value="Usage: **!traceroute <device_index> <ip_address> <source_ip (Optional)>**.", inline=False)
+                await ctx.send(embed=embed)
+                return
+        else:
+            embed.add_field(name="", value="Tracing the route to " + ip_address, inline=False)
+            await ctx.send(embed=embed)
+            command_list = ['traceroute ' + ip_address,
+                            '\n']
+            output = net_connect.send_multiline_timing(command_list)
+            if 'Invalid' in output:
+                embed = discord.Embed(title="Error", color=0xff0000)
+                embed.add_field(name="", value="Invalid input!", inline=False)
+                embed.add_field(name="", value="Usage: **!traceroute <device_index> <ip_address> <source_ip (Optional)>**.", inline=False)
+                await ctx.send(embed=embed)
+                return
+        output = output.split('\n')
+        filtered = [ x for x in output if 'msec' in x ]
+        new_output = 'Traceroute results:\n'
+        new_output += '\n'.join(filtered)
+        await ctx.send('```'+new_output+'```')
+        net_connect.disconnect()
+
 bot.run(TOKEN)
